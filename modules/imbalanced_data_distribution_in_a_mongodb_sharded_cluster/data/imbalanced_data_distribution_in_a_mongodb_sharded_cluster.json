@@ -1,0 +1,106 @@
+{
+  "name": "imbalanced_data_distribution_in_a_mongodb_sharded_cluster",
+  "description": "This incident type occurs when a MongoDB sharded cluster experiences an imbalance in the distribution of data across its shards. Sharding is a method of horizontally partitioning data across multiple servers to improve performance and scalability. However, if the distribution of data is uneven, it can lead to slower queries and poor performance. This can happen due to a variety of reasons, such as uneven data growth, uneven write patterns, or improper shard key selection. It is important to monitor and rebalance the data distribution periodically to ensure optimal performance.",
+  "params": [
+    {
+      "name": "COLLECTION",
+      "value": ""
+    },
+    {
+      "name": "PORT",
+      "value": ""
+    },
+    {
+      "name": "DATABASE",
+      "value": ""
+    },
+    {
+      "name": "MONGODB_CONNECTION_STRING",
+      "value": ""
+    },
+    {
+      "name": "HOSTNAME",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Imbalanced data distribution in a MongoDB sharded cluster.\nThis incident type occurs when a MongoDB sharded cluster experiences an imbalance in the distribution of data across its shards. Sharding is a method of horizontally partitioning data across multiple servers to improve performance and scalability. However, if the distribution of data is uneven, it can lead to slower queries and poor performance. This can happen due to a variety of reasons, such as uneven data growth, uneven write patterns, or improper shard key selection. It is important to monitor and rebalance the data distribution periodically to ensure optimal performance."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the MongoDB sharded cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --host ${HOSTNAME} --port ${PORT} --eval \"sh.status()\"`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the individual MongoDB shards"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --host ${HOSTNAME} --port ${PORT} --eval \"sh.status({verbose:true})\"`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the distribution of data across MongoDB shards"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --host ${HOSTNAME} --port ${PORT} --eval \"db.collection.getShardDistribution()\"`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the amount of data stored on each MongoDB shard"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `mongo --host ${HOSTNAME} --port ${PORT} --eval \"db.collection.totalSize()\"`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Rebalance the data across the MongoDB shards"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_rebalance_mongodb($COLLECTION, $DATABASE, $MONGODB_CONNECTION_STRING)"
+    }
+  ]
+}
